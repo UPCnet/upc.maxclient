@@ -8,14 +8,15 @@ class MaxClient(object):
     def __init__(self, url, actor=None, auth_method='basic'):
         """
         """
-        self.url = url
+        #Strip ending slashes, as all routes begin with a slash
+        self.url = url.rstrip('/')
         self.setActor(actor)
         self.auth_method = auth_method
 
-    def setActor(self, displayName):
-        self.actor = self.actor and dict(objectType='person', displayName=displayName) or None
+    def setActor(self, actor):
+        self.actor = actor and dict(objectType='person', displayName=actor) or None
 
-    def setOauth2Auth(self, oauth2_token, oauth2_grant_type='password', oauth2_scope='pythoncli'):
+    def setOAuth2Auth(self, oauth2_token, oauth2_grant_type='password', oauth2_scope='pythoncli'):
         """
         """
         self.token = oauth2_token
@@ -48,7 +49,7 @@ class MaxClient(object):
         """
         """
         headers = {}
-        resource_uri = '%s/%s' % (self.url, route)
+        resource_uri = '%s%s' % (self.url, route)
         json_query = json.dumps(query)
         if self.auth_method == 'oauth2':
             headers.update(self.OAuth2AuthHeaders())
@@ -71,7 +72,7 @@ class MaxClient(object):
         """
         """
         headers = {}
-        resource_uri = '%s/%s' % (self.url, route)
+        resource_uri = '%s%s' % (self.url, route)
         json_query = json.dumps(query)
 
         if self.auth_method == 'oauth2':
