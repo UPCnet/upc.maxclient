@@ -5,20 +5,58 @@ from upc.maxclient import ROUTES
 
 class MaxClient(object):
 
-    def __init__(self, url, actor=None):
+    def __init__(self, url, actor=None, auth_method='basic'):
         """
         """
         self.url = url
         self.setActor(actor)
+        self.auth_method = auth_method
 
     def setActor(self, displayName):
         self.actor = self.actor and dict(objectType='person', displayName=displayName) or None
 
-    def GET(self, route, query=None):
+    def setOauth2Auth(self, oauth2_token, oauth2_grant_type='password', oauth2_scope='pythoncli'):
         """
         """
+        self.token = oauth2_token
+        self.grant = oauth2_grant_type
+        self.scope = oauth2_scope
+
+    def setBasicAuth(self, username, password):
+        """
+        """
+        self.ba_username = username
+        self.ba_password = password
+
+    def OAuth2AuthHeaders(self):
+        """
+        """
+        headers = {
+            'X-Oauth-Token': self.token,
+            'X-Oauth-Username': self.actor['displayName'],
+            'X-Oauth-Scope': self.scope,
+        }
+        return headers
+
+    def BasicAuthHeaders(self):
+        """
+        """
+        auth = (self.ba_username, self.ba_password)
+        return auth
+
+    def GET(self, route, query={}):
+        """
+        """
+        headers = {}
         resource_uri = '%s/%s' % (self.url, route)
-        req = requests.get(resource_uri)
+        json_query = json.dumps(query)
+        if self.auth_method == 'oauth2':
+            headers.update(self.OAuth2AuthHeaders())
+            req = requests.get(resource_uri, data=json_query, headers=headers)
+        elif self.auth_method == 'basic':
+            req = requests.get(resource_uri, data=json_query, auth=self.BasicAuthHeaders)
+        else:
+            raise
 
         isOk = req.status_code == 200
         isJson = 'application/json' in req.headers.get('content-type', '')
@@ -29,13 +67,21 @@ class MaxClient(object):
             response = ''
         return (isOk, req.status_code, response)
 
-    def POST(self, route, query):
+    def POST(self, route, query={}):
         """
         """
+        headers = {}
         resource_uri = '%s/%s' % (self.url, route)
         json_query = json.dumps(query)
 
-        req = requests.post(resource_uri, data=json_query)
+        if self.auth_method == 'oauth2':
+            headers.update(self.OAuth2AuthHeaders())
+            req = requests.post(resource_uri, data=json_query, headers=headers)
+        elif self.auth_method == 'basic':
+            req = requests.post(resource_uri, data=json_query, auth=self.BasicAuthHeaders)
+        else:
+            raise
+
         isOk = req.status_code in [200, 201] and req.status_code or False
         isJson = 'application/json' in req.headers.get('content-type', '')
         if isOk:
