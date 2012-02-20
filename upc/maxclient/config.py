@@ -1,0 +1,21 @@
+#
+ROUTES = dict(
+users='/people',
+user='/people/%(displayName)s',
+user_activities='/people/%(displayName)s/activities',
+timeline='/people/%(displayName)s/timeline',
+user_comments='/people/%(displayName)s/comments',
+user_shares='/people/%(displayName)s/shares',
+user_likes='/people/%(displayName)s/likes',
+follows='/people/%(displayName)s/follows',
+follow='/people/%(displayName)s/follows/%(followedDN)s',
+subscriptions='/people/%(displayName)s/subscriptions',
+activities='/activities',
+activity='/activities/%(activity)s',
+comments='/activities/%(activity)s/comments',
+comment='/activities/%(activity)s/comments/%(commentId)s',
+likes='/activities/%(activity)s/likes',
+like='/activities/%(activity)s/likes/%(likeId)s',
+shares='/activities/%(activity)s/shares',
+share='/activities/%(activity)s/shares/%(shareId)s'
+)
