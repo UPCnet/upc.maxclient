@@ -13,8 +13,8 @@ class MaxClient(object):
         self.setActor(actor)
         self.auth_method = auth_method
 
-    def setActor(self, actor):
-        self.actor = actor and dict(objectType='person', displayName=actor) or None
+    def setActor(self, actor, type='person'):
+        self.actor = actor and dict(objectType='person', username=actor) or None
 
     def setOAuth2Auth(self, oauth2_token, oauth2_grant_type='password', oauth2_scope='pythoncli'):
         """
@@ -34,7 +34,7 @@ class MaxClient(object):
         """
         headers = {
             'X-Oauth-Token': self.token,
-            'X-Oauth-Username': self.actor['displayName'],
+            'X-Oauth-Username': self.actor['username'],
             'X-Oauth-Scope': self.scope,
         }
         return headers
@@ -89,6 +89,7 @@ class MaxClient(object):
             response = isJson and json.loads(req.content) or None
         else:
             print req.status_code
+            import ipdb;ipdb.set_trace()
             response = ''
 
         return (isOk, req.status_code, response)
@@ -97,13 +98,15 @@ class MaxClient(object):
     # USERS
     ###########################
 
-    def addUser(self, displayName):
+    def addUser(self, username, displayName=None):
         """
         """
         route = ROUTES['user']
 
         query = {}
-        rest_params = dict(displayName=displayName)
+        rest_params = dict(username=username)
+        if displayName:
+            query['displayName'] = displayName
 
         (success, code, response) = self.POST(route % (rest_params), query)
         return response
@@ -124,7 +127,7 @@ class MaxClient(object):
         if contexts:
             query['contexts'] = contexts
 
-        rest_params = dict(displayName=self.actor['displayName'])
+        rest_params = dict(username=self.actor['username'])
 
         (success, code, response) = self.POST(route % rest_params, query)
         return response
@@ -137,11 +140,11 @@ class MaxClient(object):
         (success, code, response) = self.GET(route % rest_params)
         return response
 
-    def getUserTimeline(self, displayName):
+    def getUserTimeline(self):
         """
         """
         route = ROUTES['timeline']
-        rest_params = dict(displayName=displayName)
+        rest_params = dict(username=self.actor['username'])
         (success, code, response) = self.GET(route % rest_params)
         return response
 
@@ -170,13 +173,35 @@ class MaxClient(object):
         rest_params = dict(activity=activity)
         (success, code, response) = self.GET(route % rest_params)
 
-    def examplePOSTCall(self, displayName):
+    ###########################
+    # SUBSCRIPTIONS
+    ###########################
+
+    def subscribe(self, url, otype='context'):
+        """
+        """
+        route = ROUTES['subscriptions']
+
+        query = dict(object=dict(objectType=otype,
+                                 url=url,
+                                  ),
+                    )
+        rest_params = dict(username=self.actor['username'])
+
+        (success, code, response) = self.POST(route % rest_params, query)
+        return response
+
+    # def unsubscribe(self,username,url,otype='service'):
+    #     """
+    #     """
+
+    def examplePOSTCall(self, username):
         """
         """
         route = ROUTES['']
 
         query = {}
-        rest_params = dict(displayName=displayName)
+        rest_params = dict(username=username)
 
         (success, code, response) = self.POST(route % rest_params, query)
         return response
@@ -189,18 +214,10 @@ class MaxClient(object):
         (success, code, response) = self.GET(route % rest_params)
         return response
 
-    # def follow(self,displayName,oid,otype='person'):
+    # def follow(self,username,oid,otype='person'):
     #     """
     #     """
 
-    # def unfollow(self,displayName,oid,otype='person'):
-    #     """
-    #     """
-
-    # def subscribe(self,url,otype='context'):
-    #     """
-    #     """
-
-    # def unsubscribe(self,displayName,url,otype='service'):
+    # def unfollow(self,username,oid,otype='person'):
     #     """
     #     """
