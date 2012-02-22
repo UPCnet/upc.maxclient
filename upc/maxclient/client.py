@@ -13,6 +13,19 @@ class MaxClient(object):
         self.setActor(actor)
         self.auth_method = auth_method
 
+    def parse_list(self, key, items):
+        return '&'.join([('%s=%s') % (key, value) for value in items])
+
+    def parseParams(self, params):
+        """
+        """
+        qs = []
+        for key in params:
+            value = params[key]
+            if isinstance(value, list):
+                qs.append(self.parse_list(key, value))
+        return '&'.join(qs)
+
     def setActor(self, actor, type='person'):
         self.actor = actor and dict(objectType='person', username=actor) or None
 
@@ -45,17 +58,18 @@ class MaxClient(object):
         auth = (self.ba_username, self.ba_password)
         return auth
 
-    def GET(self, route, query={}):
+    def GET(self, route, qs=''):
         """
         """
         headers = {}
         resource_uri = '%s%s' % (self.url, route)
-        json_query = json.dumps(query)
+        if qs:
+            resource_uri = '%s?%s' % (resource_uri, qs)
         if self.auth_method == 'oauth2':
             headers.update(self.OAuth2AuthHeaders())
-            req = requests.get(resource_uri, data=json_query, headers=headers)
+            req = requests.get(resource_uri, headers=headers)
         elif self.auth_method == 'basic':
-            req = requests.get(resource_uri, data=json_query, auth=self.BasicAuthHeaders)
+            req = requests.get(resource_uri, auth=self.BasicAuthHeaders)
         else:
             raise
 
@@ -89,7 +103,6 @@ class MaxClient(object):
             response = isJson and json.loads(req.content) or None
         else:
             print req.status_code
-            import ipdb;ipdb.set_trace()
             response = ''
 
         return (isOk, req.status_code, response)
@@ -145,6 +158,17 @@ class MaxClient(object):
         route = ROUTES['timeline']
         rest_params = dict(username=self.actor['username'])
         (success, code, response) = self.GET(route % rest_params)
+        return response
+
+    def getUserActivities(self, contexts=[]):
+        """
+        """
+        route = ROUTES['activities']
+        query = {}
+        if contexts:
+            query = {'contexts': contexts}
+        print self.parseParams(query)
+        (success, code, response) = self.GET(route, qs=self.parseParams(query))
         return response
 
     ###########################
