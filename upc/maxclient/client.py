@@ -119,8 +119,7 @@ class MaxClient(object):
         """
         """
         route = ROUTES['user_activities']
-        query = dict(verb='post',
-                     object=dict(objectType=otype,
+        query = dict(object=dict(objectType=otype,
                                    content=content,
                                   ),
                     )
@@ -157,7 +156,6 @@ class MaxClient(object):
         """
         route = ROUTES['comments']
         query = dict(actor=self.actor,
-                     verb='post',
                      object=dict(objectType=otype,
                                  content=content,
                                   ),
