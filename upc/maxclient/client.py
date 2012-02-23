@@ -24,6 +24,8 @@ class MaxClient(object):
             value = params[key]
             if isinstance(value, list):
                 qs.append(self.parse_list(key, value))
+            else:
+                qs.append('%s=%s' % (key, str(value)))
         return '&'.join(qs)
 
     def setActor(self, actor, type='person'):
