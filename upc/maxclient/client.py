@@ -1,5 +1,6 @@
 import requests
 import json
+import urllib
 from upc.maxclient import ROUTES
 
 
@@ -12,21 +13,6 @@ class MaxClient(object):
         self.url = url.rstrip('/')
         self.setActor(actor)
         self.auth_method = auth_method
-
-    def parse_list(self, key, items):
-        return '&'.join([('%s=%s') % (key, value) for value in items])
-
-    def parseParams(self, params):
-        """
-        """
-        qs = []
-        for key in params:
-            value = params[key]
-            if isinstance(value, list):
-                qs.append(self.parse_list(key, value))
-            else:
-                qs.append('%s=%s' % (key, str(value)))
-        return '&'.join(qs)
 
     def setActor(self, actor, type='person'):
         self.actor = actor and dict(objectType='person', username=actor) or None
@@ -169,8 +155,7 @@ class MaxClient(object):
         query = {}
         if contexts:
             query = {'contexts': contexts}
-        print self.parseParams(query)
-        (success, code, response) = self.GET(route, qs=self.parseParams(query))
+        (success, code, response) = self.GET(route, qs=urllib.urlencode(query, True))
         return response
 
     ###########################
