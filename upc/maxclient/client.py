@@ -55,9 +55,9 @@ class MaxClient(object):
             resource_uri = '%s?%s' % (resource_uri, qs)
         if self.auth_method == 'oauth2':
             headers.update(self.OAuth2AuthHeaders())
-            req = requests.get(resource_uri, headers=headers)
+            req = requests.get(resource_uri, headers=headers, verify=False)
         elif self.auth_method == 'basic':
-            req = requests.get(resource_uri, auth=self.BasicAuthHeaders)
+            req = requests.get(resource_uri, auth=self.BasicAuthHeaders(), verify=False)
         else:
             raise
 
@@ -79,9 +79,9 @@ class MaxClient(object):
 
         if self.auth_method == 'oauth2':
             headers.update(self.OAuth2AuthHeaders())
-            req = requests.post(resource_uri, data=json_query, headers=headers)
+            req = requests.post(resource_uri, data=json_query, headers=headers, verify=False)
         elif self.auth_method == 'basic':
-            req = requests.post(resource_uri, data=json_query, auth=self.BasicAuthHeaders)
+            req = requests.post(resource_uri, data=json_query, auth=self.BasicAuthHeaders(), verify=False)
         else:
             raise
 
