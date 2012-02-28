@@ -95,6 +95,31 @@ class MaxClient(object):
 
         return (isOk, req.status_code, response)
 
+    def PUT(self, route, query={}):
+        """
+        """
+        headers = {}
+        resource_uri = '%s%s' % (self.url, route)
+        json_query = json.dumps(query)
+
+        if self.auth_method == 'oauth2':
+            headers.update(self.OAuth2AuthHeaders())
+            req = requests.put(resource_uri, data=json_query, headers=headers, verify=False)
+        elif self.auth_method == 'basic':
+            req = requests.post(resource_uri, data=json_query, auth=self.BasicAuthHeaders(), verify=False)
+        else:
+            raise
+
+        isOk = req.status_code in [200, 201] and req.status_code or False
+        isJson = 'application/json' in req.headers.get('content-type', '')
+        if isOk:
+            response = isJson and json.loads(req.content) or None
+        else:
+            print req.status_code
+            response = ''
+
+        return (isOk, req.status_code, response)
+
     ###########################
     # USERS
     ###########################
@@ -110,6 +135,19 @@ class MaxClient(object):
             query['displayName'] = displayName
 
         (success, code, response) = self.POST(route % (rest_params), query)
+        return response
+
+    def modifyUser(self, username):
+        """
+        """
+        route = ROUTES['user']
+
+        query = {}
+        rest_params = dict(username=username)
+        if displayName:
+            query['displayName'] = displayName
+
+        (success, code, response) = self.PUT(route % (rest_params), query)
         return response
 
     ###########################
