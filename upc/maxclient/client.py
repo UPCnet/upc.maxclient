@@ -79,6 +79,7 @@ class MaxClient(object):
 
         if self.auth_method == 'oauth2':
             headers.update(self.OAuth2AuthHeaders())
+            headers.update({'content-type': 'application/json'})
             req = requests.post(resource_uri, data=json_query, headers=headers, verify=False)
         elif self.auth_method == 'basic':
             req = requests.post(resource_uri, data=json_query, auth=self.BasicAuthHeaders(), verify=False)
@@ -99,15 +100,15 @@ class MaxClient(object):
     # USERS
     ###########################
 
-    def addUser(self, username, displayName=None):
+    def addUser(self, username, **kwargs):
         """
         """
         route = ROUTES['user']
 
         query = {}
         rest_params = dict(username=username)
-        if displayName:
-            query['displayName'] = displayName
+        valid_properties = ['displayName']
+        query = dict([(k, v) for k, v in kwargs.items() if k in valid_properties])
 
         (success, code, response) = self.POST(route % (rest_params), query)
         return response
