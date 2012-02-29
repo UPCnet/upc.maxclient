@@ -138,15 +138,13 @@ class MaxClient(object):
         (success, code, response) = self.POST(route % (rest_params), query)
         return response
 
-    def modifyUser(self, username):
+    def modifyUser(self, username, properties):
         """
         """
         route = ROUTES['user']
 
-        query = {}
+        query = properties
         rest_params = dict(username=username)
-        if displayName:
-            query['displayName'] = displayName
 
         (success, code, response) = self.PUT(route % (rest_params), query)
         return response
