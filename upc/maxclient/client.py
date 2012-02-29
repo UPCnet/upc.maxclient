@@ -107,7 +107,7 @@ class MaxClient(object):
             headers.update(self.OAuth2AuthHeaders())
             req = requests.put(resource_uri, data=json_query, headers=headers, verify=False)
         elif self.auth_method == 'basic':
-            req = requests.post(resource_uri, data=json_query, auth=self.BasicAuthHeaders(), verify=False)
+            req = requests.put(resource_uri, data=json_query, auth=self.BasicAuthHeaders(), verify=False)
         else:
             raise
 
@@ -145,7 +145,7 @@ class MaxClient(object):
 
         query = properties
         rest_params = dict(username=username)
-
+        import ipdb; ipdb.set_trace( )
         (success, code, response) = self.PUT(route % (rest_params), query)
         return response
 
