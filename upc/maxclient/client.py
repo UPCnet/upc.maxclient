@@ -145,7 +145,7 @@ class MaxClient(object):
 
         query = properties
         rest_params = dict(username=username)
-        import ipdb; ipdb.set_trace( )
+
         (success, code, response) = self.PUT(route % (rest_params), query)
         return response
 
