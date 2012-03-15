@@ -1,8 +1,7 @@
 Changelog
 =========
 
-1.0dev (unreleased)
+1.0 (2012-03-15)
 -------------------
 
-- Package created using zopeskel
-  []
+- Initial release
